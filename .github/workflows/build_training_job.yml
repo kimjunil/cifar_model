@@ -1,0 +1,46 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags: 
+      - 'v*'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set env
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+        
+    - name: Docker Build & Push Action
+      uses: mr-smithers-excellent/docker-build-push@v5.6
+      with:
+        image: cifar_classifier
+        tags: ${{ env.RELEASE_VERSION }}
+        registry: ghcr.io
+        dockerfile: Dockerfile
+        directory: .
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}
+        buildArgs: GCS_BUCKET_ARG=${{ secrets.GCS_BUCKET }}, MODEL_TAG_ARG=${{ env.RELEASE_VERSION }}, GITHUB_OWNER_ARG=${{ github.repository_owner }}, GITHUB_REPO_ARG=mlops_mnist_service, GITHUB_WORKFLOW_ARG=bento.yml, GITHUB_TOKEN_ARG=${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}
+        addLatest: true
+
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
+    - name: Checkout argoce_config
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}
+        repository: kimjunil/cifar_argocd
+        path: cifar_argocd
+    - name: Set new image tag
+      run: |
+        cd cifar_argocd/overlays/dev
+        kustomize edit set image ghcr.io/kimjunil/cifar_classifier:${{ env.RELEASE_VERSION }}
+        git config --global user.name ${{ github.repository_owner }}
+        git config --global user.email "iam@junil.kim"
+        git commit -am 'Publish new version ${{ env.RELEASE_VERSION }} to dev'
+        git push || echo 'no changes'
