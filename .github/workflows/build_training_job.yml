@@ -25,7 +25,7 @@ jobs:
         directory: .
         username: ${{ github.repository_owner }}
         password: ${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}
-        buildArgs: GCS_BUCKET_ARG=${{ secrets.GCS_BUCKET }}, MODEL_TAG_ARG=${{ env.RELEASE_VERSION }}, GITHUB_OWNER_ARG=${{ github.repository_owner }}, GITHUB_REPO_ARG=mlops_mnist_service, GITHUB_WORKFLOW_ARG=bento.yml, GITHUB_TOKEN_ARG=${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}
+        buildArgs: GCS_BUCKET_ARG=${{ secrets.GCS_BUCKET }}, MODEL_TAG_ARG=${{ env.RELEASE_VERSION }}, GITHUB_OWNER_ARG=${{ github.repository_owner }}, GITHUB_REPO_ARG=mlops_mnist_service, GITHUB_WORKFLOW_ARG=bento.yml, GITHUB_TOKEN_ARG=${{ secrets.PACKAGE_REGISTRY_ACCESS_TOKEN}}, WEB_HOOK_URL_ARG=${{ secrets.SLACK_WEB_HOOK_URL }}
         addLatest: true
 
     - name: Setup Kustomize
