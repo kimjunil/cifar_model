@@ -20,9 +20,16 @@ def get_args():
     parser.add_argument(
         '--epochs',
         type=int,
-        default=1,
+        default=10,
         metavar='N',
-        help='number of epochs to train (default: 1)')
+        help='number of epochs to train (default: 10)')
+
+    parser.add_argument(
+        '--batchsize',
+        type=int,
+        default=128,
+        metavar='N',
+        help='batch size (default: 128)')
 
     args = parser.parse_args()
     return args
@@ -79,16 +86,17 @@ def main():
 
     args = get_args()
     epochs = args.epochs
-    # gcp_bucket = os.getenv("GCS_BUCKET")
+    batch_size = args.batchsize
+    gcp_bucket = os.getenv("GCS_BUCKET")
 
-    # bucket_path = os.path.join(gcp_bucket, "cifar_model")
+    bucket_path = os.path.join(gcp_bucket, "cifar_model")
 
     model = get_model()
     (train_x, train_y), (test_x, test_y) = load_data()
     
     train_x, test_x = train_x/255.0, test_x/255.0
     
-    history = model.fit(train_x, train_y, epochs=epochs)
+    history = model.fit(train_x, train_y, epochs=epochs, batch_size=batch_size)
     loss, acc = model.evaluate(test_x, test_y)
     print("model acc: {:.4f}, model loss: {:.4f}".format(acc, loss))
 
@@ -96,21 +104,21 @@ def main():
     save_path = "save_at_{}_acc_{}_loss_.h5".format(timestamp, acc, loss)
     model.save(save_path)
 
-    # gs_path = os.path.join(bucket_path, save_path)
+    gs_path = os.path.join(bucket_path, save_path)
 
-    # with file_io.FileIO(save_path, mode='rb') as input_file:
-    #     with file_io.FileIO(gs_path, mode='wb+') as output_file:
-    #         output_file.write(input_file.read())
+    with file_io.FileIO(save_path, mode='rb') as input_file:
+        with file_io.FileIO(gs_path, mode='wb+') as output_file:
+            output_file.write(input_file.read())
 
     end = time.time()
     sec = (end - start) 
     training_time = str(datetime.timedelta(seconds=sec)).split(".")[0]
 
-    # slack_url = os.getenv("WEB_HOOK_URL")
-    # if slack_url != None:
-    #     send_message_to_slack(slack_url, acc, loss, training_time, gs_path)
+    slack_url = os.getenv("WEB_HOOK_URL")
+    if slack_url != None:
+        send_message_to_slack(slack_url, acc, loss, training_time, gs_path)
 
-    # request_deploy_api(gs_path)
+    request_deploy_api(gs_path)
     
 if __name__ == '__main__':
   main()
