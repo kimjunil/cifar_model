@@ -23,11 +23,10 @@ ARG WEB_HOOK_URL_ARG
 ENV WEB_HOOK_URL=${WEB_HOOK_URL_ARG}
 
 # Copies the trainer code
-RUN mkdir /root/trainer
-COPY utils.py /root/trainer/utils.py
-COPY train.py /root/trainer/mnist.py
-COPY data/ /root/trainer/data/
-RUN ls -la /root/trainer/data/*
+COPY utils.py /root/utils.py
+COPY train.py /root/mnist.py
+COPY data/ /root/data/
+RUN ls -la /root/data/*
 
 RUN pip install pillow
 RUN pip install numpy
