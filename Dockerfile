@@ -32,4 +32,4 @@ RUN pip install pillow
 RUN pip install numpy
 
 # Sets up the entry point to invoke the trainer.
-ENTRYPOINT ["python", "trainer/mnist.py"]
+ENTRYPOINT ["python", "mnist.py"]
