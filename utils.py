@@ -35,6 +35,7 @@ def send_message_to_slack(url, acc, loss, training_time, model_path):
         ]
     }
     requests.post(url, json=payload)
+    print(url, "\n", payload)
 
 def request_deploy_api(model_path):
     owner = os.getenv("GITHUB_OWNER")
