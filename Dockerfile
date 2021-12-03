@@ -22,14 +22,11 @@ ENV MODEL_TAG=${MODEL_TAG_ARG}
 ARG WEB_HOOK_URL_ARG
 ENV WEB_HOOK_URL=${WEB_HOOK_URL_ARG}
 
+RUN pip install pillow
+RUN pip install numpy
+
 # Copies the trainer code
 COPY utils.py /root/utils.py
 COPY train.py /root/mnist.py
 COPY data/ /root/data/
 RUN ls -la /root/data/*
-
-RUN pip install pillow
-RUN pip install numpy
-
-# Sets up the entry point to invoke the trainer.
-ENTRYPOINT ["python", "mnist.py", "--epochs", "20", "--batchsize", "1"]

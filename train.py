@@ -17,19 +17,12 @@ import glob
 def get_args():
     parser = argparse.ArgumentParser(description='Tensorflow CIFAR-10 Example')
   
-    parser.add_argument(
-        '--epochs',
-        type=int,
-        default=10,
-        metavar='N',
-        help='number of epochs to train (default: 10)')
 
-    parser.add_argument(
-        '--batchsize',
-        type=int,
-        default=128,
-        metavar='N',
-        help='batch size (default: 128)')
+    parser.add_argument('--units', default=128, type=float)
+    parser.add_argument('--learning_rate', default=0.01, type=float)
+    parser.add_argument('--dropout', default=0.2, type=float)
+    parser.add_argument('--epochs', default=5, type=int)
+    parser.add_argument('--batchsize', default=128, type=int)
 
     args = parser.parse_args()
     return args
